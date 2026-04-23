@@ -5,7 +5,9 @@
 > Actions: ingest, update, query, lint, create, archive, delete
 > When this file exceeds 500 entries, rotate: rename to log-YYYY.md, start fresh.
 
-## [2026-04-23] create | Wiki initialized
+## [2026-04-23] create | Hermes Tool Ecosystem inventory
+- Created [concepts/hermes-tool-ecosystem.md](concepts/hermes-tool-ecosystem.md) – categorized tool inventory with official documentation links (17 categories, 50+ tools)
+- Updated [index.md](index.md) with new page entry
 - Domain: AI/ML tools, frameworks, and agents
 - Structure created with SCHEMA.md, index.md, log.md
 - Git repository: https://github.com/shaohuabaishuo/llm_wiki.git

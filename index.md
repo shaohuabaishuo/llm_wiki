@@ -2,7 +2,7 @@
 
 > Content catalog. Every wiki page listed under its type with a one-line summary.
 > Read this first to find relevant pages for any query.
-> Last updated: 2026-04-23 | Total pages: 10
+> Last updated: 2026-04-23 | Total pages: 11
 
 ## Entities
 <!-- Alphabetical within section -->
@@ -17,6 +17,7 @@
 <!-- Alphabetical within section -->
 - [AI-Assisted Long-Form Novel Writing](concepts/ai-novel-writing.md) – Approaches, architectures, and best practices for AI novel writing.
 - [LLM Wiki](concepts/llm-wiki.md) – Persistent, interlinked markdown knowledge base pattern for compounding knowledge.
+- [Hermes Tool Ecosystem](concepts/hermes-tool-ecosystem.md) – Comprehensive inventory of all tools in the Hermes Agent ecosystem, categorized with official documentation links.
 
 ## Comparisons
 <!-- Alphabetical within section -->
