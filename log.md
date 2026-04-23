@@ -54,6 +54,10 @@
 - All 10 pages now have inbound links; no new orphans or broken links
 
 ## [2026-04-23] create | Obsidian 入门使用说明书
-- Added `obsidian` tag to SCHEMA.md taxonomy (under Tools)
-- Created concept page: concepts/obsidian-guide.md
-- Updated index.md (total pages: 11 → 12)
+|- Added `obsidian` tag to SCHEMA.md taxonomy (under Tools)
+|- Created concept page: concepts/obsidian-guide.md
+|- Updated index.md (total pages: 11 → 12)
+
+## [2026-04-23] create | Hermes 编程最佳实践
+|- Created concept page: concepts/hermes-programming-best-practices.md — comprehensive Chinese guide for using Hermes Agent for programming (14 sections covering workflow, tools, TDD, debugging, subagents, code review, git, cron, pitfalls)
+|- Updated index.md (total pages: 12 → 13)
