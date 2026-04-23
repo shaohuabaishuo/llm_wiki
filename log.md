@@ -52,3 +52,8 @@
 - 3 pre-existing broken links in entities/hermes-agent-installation.md (out of scope)
 - Fixed orphan: added [[best-novel-writing-agent-2026]] link from comparisons page
 - All 10 pages now have inbound links; no new orphans or broken links
+
+## [2026-04-23] create | Obsidian 入门使用说明书
+- Added `obsidian` tag to SCHEMA.md taxonomy (under Tools)
+- Created concept page: concepts/obsidian-guide.md
+- Updated index.md (total pages: 11 → 12)

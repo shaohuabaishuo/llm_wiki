@@ -47,7 +47,7 @@ The `sha256:` lets a future re-ingest of the same URL skip processing when conte
 ## Tag Taxonomy
 [Define 10-20 top-level tags for the domain. Add new tags here BEFORE using them.]
 
-- Tools: agent, cli, framework, library, sdk
+- Tools: agent, cli, framework, library, sdk, obsidian
 - Platforms: local, cloud, docker, kubernetes
 - Tasks: installation, configuration, deployment, troubleshooting, optimization
 - Concepts: llm, rag, fine-tuning, inference, orchestration, wiki, creative-writing, pipeline
