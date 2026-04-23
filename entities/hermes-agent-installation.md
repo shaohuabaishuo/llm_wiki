@@ -57,6 +57,7 @@ For more diagnostics, run `hermes doctor`.
 - [[Hermes Agent]] (the main entity)
 - [[CLI AI assistants]] (broader category)
 - [[Termux setup]] (Android installation)
+- [[LLM Wiki]] (knowledge base pattern used by Hermes)
 
 ## References
 ^[raw/articles/hermes-installation.md]

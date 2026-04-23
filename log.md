@@ -14,3 +14,9 @@
 - Source: https://hermes-agent.nousresearch.com/docs/getting-started/installation
 - Raw saved: raw/articles/hermes-installation.html, raw/articles/hermes-installation.md
 - Entity created: entities/hermes-agent-installation.md
+
+## [2026-04-23] ingest | LLM Wiki skill documentation
+- Source: hermes://skill/llm-wiki
+- Raw saved: raw/articles/llm-wiki-skill-2026.md
+- Concept created: concepts/llm-wiki.md
+- Schema updated: added "wiki" tag to taxonomy

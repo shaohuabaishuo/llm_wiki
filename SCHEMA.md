@@ -50,7 +50,7 @@ The `sha256:` lets a future re-ingest of the same URL skip processing when conte
 - Tools: agent, cli, framework, library, sdk
 - Platforms: local, cloud, docker, kubernetes
 - Tasks: installation, configuration, deployment, troubleshooting, optimization
-- Concepts: llm, rag, fine-tuning, inference, orchestration
+- Concepts: llm, rag, fine-tuning, inference, orchestration, wiki
 - Providers: openai, anthropic, deepseek, localai
 - Meta: comparison, benchmark, tutorial, reference, faq
 
