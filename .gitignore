@@ -1,0 +1,34 @@
+# Temporary files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg-info/
+dist/
+build/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Extracted raw HTML (already saved as markdown)
+# raw/articles/*.html
+
+# Temporary scripts
+extract.py
