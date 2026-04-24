@@ -61,3 +61,17 @@
 ## [2026-04-23] create | Hermes 编程最佳实践
 |- Created concept page: concepts/hermes-programming-best-practices.md — comprehensive Chinese guide for using Hermes Agent for programming (14 sections covering workflow, tools, TDD, debugging, subagents, code review, git, cron, pitfalls)
 |- Updated index.md (total pages: 12 → 13)
+
+## [2026-04-24] create | Inkos 连接本地 Ollama 模型完整配置指南
+- Added `ollama` and `wsl` tags to SCHEMA.md taxonomy
+- Created concept page: concepts/inkos-ollama-local-setup.md — 从零开始将 Inkos 接入本地 Ollama 模型的完整操作流程，含 WSL2 网络穿透、.env 和 inkos.json 双配置、模型切换、故障排查清单（6 步操作流程 + 4 常见问题 + 7 项检查清单）
+- Cross-references: [[inkos-novel-agent]], [[ai-novel-writing]], [[best-novel-writing-agent-2026]]
+- Source: 两次真实调试会话经验（WSL2 网络隔离诊断 → Ollama 0.0.0.0 绑定 → Inkos 双文件配置）
+- Updated index.md (total pages: 13 → 14)
+
+## [2026-04-24] create | Hermes 接入本地 DeepSeek 模型配置指南
+- Created concept page: concepts/hermes-local-deepseek-setup.md — Hermes Agent 对接本地 Ollama DeepSeek 模型的完整操作指南（10 章节：环境概览、WSL2 网络配置、Ollama 上下文优化、config.yaml 配置、模型切换、工具调用限制分析、验证流程、常见问题、检查清单）
+- 关键技术点：Ollama 默认 context 不足且需手动设置 OLLAMA_CONTEXT_LENGTH、deepseek-r1:8b 在 Ollama 上不支持工具调用、WSL2 mirrored 网络模式 vs NAT 模式、named custom provider 实现云端/本地无缝切换
+- Cross-references: [[hermes-agent-installation]], [[hermes-programming-best-practices]], [[hermes-tool-ecosystem]], [[inkos-ollama-local-setup]], [[llm-wiki]]
+- 配置产物：~/.hermes/config.yaml 添加了 custom_providers.local-deepseek + .wslconfig 配置 mirrored 网络
+- Updated index.md (total pages: 14 → 15)
