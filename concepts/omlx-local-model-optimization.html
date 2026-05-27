@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oMLX 本地模型部署与性能优化实战</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --orange: #d2991d;
+    --purple: #a371f7;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  h1 { font-size: 2.2rem; margin-bottom: 0.3rem; color: #f0f6fc; }
+  h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); color: #f0f6fc; }
+  h3 { font-size: 1.15rem; margin: 1.5rem 0 0.6rem; color: #e6edf3; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+  th, td { padding: 0.6rem 0.85rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #21262d; color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; }
+  td { color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  .good { color: var(--green); font-weight: 600; }
+  .warn { color: var(--orange); font-weight: 600; }
+  .bad { color: var(--red); font-weight: 600; }
+  .muted { color: var(--muted); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-box .label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; }
+  .stat-box .value { font-size: 1.8rem; font-weight: 700; margin: 0.3rem 0; }
+  .tag {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0.15rem;
+  }
+  .tag-ok { background: #1b3a1b; color: var(--green); }
+  .tag-warn { background: #3a2e0e; color: var(--orange); }
+  .tag-err { background: #3a1515; color: var(--red); }
+  .tag-info { background: #15223a; color: var(--accent); }
+  pre { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.88em; }
+  .bench-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .bench-before { border-left: 3px solid var(--red); }
+  .bench-after { border-left: 3px solid var(--green); }
+  .progress-bar {
+    background: #21262d;
+    border-radius: 4px;
+    height: 8px;
+    width: 100%;
+    margin: 0.3rem 0 0.6rem;
+  }
+  .progress-fill { background: var(--accent); border-radius: 4px; height: 100%; }
+  .progress-fill.g { background: var(--green); }
+  .progress-fill.r { background: var(--red); }
+  .progress-fill.o { background: var(--orange); }
+  .timeline { position: relative; padding-left: 2rem; margin: 1.5rem 0; }
+  .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background: var(--border); }
+  .timeline-item { margin-bottom: 1.5rem; position: relative; }
+  .timeline-dot { position: absolute; left: -1.6rem; top: 4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); }
+  .timeline-dot.bad-dot { border-color: var(--red); }
+  .timeline-dot.good-dot { border-color: var(--green); }
+  .warning-box {
+    background: #3a2e0e;
+    border-left: 4px solid var(--orange);
+    padding: 0.8rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .info-box {
+    background: #15223a;
+    border-left: 4px solid var(--accent);
+    padding: 0.8rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>oMLX 本地模型部署与性能优化实战</h1>
+<p class="subtitle">
+  MacBook Pro M5 Pro (48GB) + oMLX v0.3.11 · Claude Code 本地推理 · 从 <span class="bad">14.6 tok/s</span> 到 <span class="good">70 tok/s</span> 的系统性调优
+</p>
+
+<!-- ENVIRONMENT -->
+<h2>测试环境</h2>
+<div class="stat-grid">
+  <div class="stat-box">
+    <div class="label">硬件</div>
+    <div class="value" style="font-size:1.2rem;">M5 Pro</div>
+    <div class="muted" style="font-size:0.8rem;">48GB Unified Memory</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">系统</div>
+    <div class="value" style="font-size:1.2rem;">macOS 26.5</div>
+    <div class="muted" style="font-size:0.8rem;">Apple Silicon</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">oMLX 版本</div>
+    <div class="value" style="font-size:1.2rem;">v0.3.11</div>
+    <div class="muted" style="font-size:0.8rem;">DMG 安装</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">Metal 上限</div>
+    <div class="value" style="font-size:1.2rem;">37.4 GB</div>
+    <div class="muted" style="font-size:0.8rem;">硬件天花板</div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:1rem;">
+  <h3 style="margin-top:0;">可用模型</h3>
+  <table>
+    <tr><th>模型</th><th>磁盘大小</th><th>架构</th><th>引擎</th><th>状态</th></tr>
+    <tr><td>Qwen3.6-27B-4bit</td><td>15.70 GB</td><td>GDN</td><td>VLM/Batched</td><td><span class="tag tag-warn">备用</span></td></tr>
+    <tr><td>Qwen3.6-27B-MTPLX-Optimized-Speed</td><td>16.03 GB</td><td>GDN + Thinking</td><td>VLM</td><td><span class="tag tag-err">已禁用</span></td></tr>
+    <tr><td><strong>Qwen2.5-Coder-14B-Instruct-MLX-4bit</strong></td><td><strong>8.13 GB</strong></td><td><strong>标准注意力</strong></td><td><strong>Batched</strong></td><td><span class="tag tag-ok">主力</span></td></tr>
+    <tr><td>GLM-4.7-Flash-4bit</td><td>16.48 GB</td><td>MoE</td><td>Batched</td><td><span class="tag tag-err">.disabled</span></td></tr>
+  </table>
+</div>
+
+<!-- OPTIMIZATION JOURNEY -->
+<h2>优化全流程</h2>
+
+<div class="timeline">
+
+  <!-- Stage 0 -->
+  <div class="timeline-item">
+    <div class="timeline-dot bad-dot"></div>
+    <h3 style="margin-top:0;">初始状态：双模型 + MTPLX Thinking <span class="tag tag-err">严重缓慢</span></h3>
+    <p class="muted">Qwen3.6-27B-MTPLX + Qwen2.5-Coder-14B 双模型加载，Claude Code 全层 MTPLX</p>
+    <div class="stat-grid">
+      <div class="stat-box bench-before">
+        <div class="label">Token 生成</div>
+        <div class="value bad">14.6</div>
+        <div class="muted">tok/s</div>
+        <div class="progress-bar"><div class="progress-fill r" style="width:18%"></div></div>
+      </div>
+      <div class="stat-box bench-before">
+        <div class="label">PhysMem 使用</div>
+        <div class="value bad">43 GB</div>
+        <div class="muted">/ 48 GB (仅剩 3.7G)</div>
+        <div class="progress-bar"><div class="progress-fill r" style="width:90%"></div></div>
+      </div>
+      <div class="stat-box bench-before">
+        <div class="label">内存压力</div>
+        <div class="value bad">持续震荡</div>
+        <div class="muted">ok↔soft 每秒循环</div>
+      </div>
+      <div class="stat-box bench-before">
+        <div class="label">Cache 队列</div>
+        <div class="value bad">8→1</div>
+        <div class="muted">反复限速</div>
+      </div>
+    </div>
+    <div class="warning-box">
+      <strong>根因:</strong> MTPLX 每次工具调用输出 200-500 token 思维链，14B Coder pinned 预加载吃 8GB，双模型推高基线 → prefill 峰值撞 hard 阈值 → cache 被打残。
+    </div>
+  </div>
+
+  <!-- Stage 1 -->
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <h3 style="margin-top:0;">Step 1: 单模型 + Vanilla 27B <span class="tag tag-warn">内存优化</span></h3>
+    <p class="muted">Unpin Coder-14B → 只用 Qwen3.6-27B-4bit → chunked_prefill: true</p>
+    <div class="bench-compare">
+      <div class="card bench-before">
+        <div class="muted" style="font-size:0.78rem;">优化前</div>
+        <div>模型内存: <strong>23.6 GB</strong></div>
+        <div>PhysMem 空闲: <strong>3.7 GB</strong></div>
+        <div>Token: <strong class="bad">14.6 tok/s</strong></div>
+      </div>
+      <div class="card bench-after">
+        <div class="muted" style="font-size:0.78rem;">优化后</div>
+        <div>模型内存: <strong class="good">15.7 GB</strong> (-33%)</div>
+        <div>PhysMem 空闲: <strong class="good">7.2 GB</strong> (+95%)</div>
+        <div>Token: <strong class="warn">14.9 tok/s</strong> (几乎不变)</div>
+      </div>
+    </div>
+    <div class="warning-box">
+      <strong>关键发现:</strong> 内存压力完全解除，但 Token 速度几乎不变。说明瓶颈不在内存，而在别处。
+    </div>
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="timeline-item">
+    <div class="timeline-dot good-dot"></div>
+    <h3 style="margin-top:0;">Step 2: 消灭 Thinking Tokens <span class="tag tag-ok">8.6x 加速</span></h3>
+    <p class="muted">Dashboard → Models → Qwen3.6-27B-4bit → 关闭 Enable Thinking</p>
+    <div class="bench-compare">
+      <div class="card bench-before">
+        <div class="muted" style="font-size:0.78rem;">Thinking ON</div>
+        <pre>"2+2等于几？只回答数字"
+→ 6.2s / 100 tokens
+→ "Here's a thinking process:
+   1. Analyze User Input...
+   2. Identify Core Task...
+   3. Perform Calculation..."
+→ 还没到 "4"</pre>
+      </div>
+      <div class="card bench-after">
+        <div class="muted" style="font-size:0.78rem;">Thinking OFF</div>
+        <pre>"2+2等于几？只回答数字"
+→ <strong class="good">0.72s / 1 token</strong>
+→ "4"</pre>
+      </div>
+    </div>
+    <div class="info-box">
+      <strong>洞察:</strong> Qwen3.6-27B-4bit（非 MTPLX 版本）也在 Claude Code system prompt 触发下输出思维链。有效 token 占 35-50%。关闭后有效吞吐翻倍。
+    </div>
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <h3 style="margin-top:0;">Step 3: GDN Cache 问题 → 切换模型 <span class="tag tag-warn">架构决策</span></h3>
+    <p class="muted">Qwen3.6-27B → Qwen2.5-Coder-14B：标准注意力避开 GDN cache 兼容性问题</p>
+    <pre style="font-size:0.8rem;">
+<span class="bad">01:06:38</span>  Claude Code 请求进入
+<span class="bad">01:07:27</span>  Prefix cache 被拒绝 → <span class="bad">"rejecting cache to prevent stale GDN state"</span>
+01:11:22  第一个工具调用完成 <span class="muted">(4分钟后!)</span>
+01:12:35  再次 cache 拒绝
+01:14:28  请求被中止 <span class="muted">(8分钟，未正常完成)</span></pre>
+    <div class="info-box">
+      <strong>GDN (GatedDeltaNet)</strong> 是有状态注意力机制。oMLX SSD prefix cache 匹配到不完整块时，为保证状态一致性直接拒绝缓存 → 强制从头 prefill。标准注意力的 Qwen2.5 无此问题。
+    </div>
+  </div>
+
+  <!-- Stage 4 -->
+  <div class="timeline-item">
+    <div class="timeline-dot good-dot"></div>
+    <h3 style="margin-top:0;">Step 4: Context 窗口校准 <span class="tag tag-ok">甜蜜点</span></h3>
+    <p class="muted">64K → 96K → 131K 测试，找到最佳平衡点</p>
+    <table>
+      <tr><th>Context</th><th>KV Cache</th><th>进程基线</th><th>Peak 峰值</th><th>工作空间</th><th>结果</th></tr>
+      <tr><td>64K</td><td>9 GB</td><td>27 GB</td><td>30 GB</td><td>24K</td><td><span class="tag tag-warn">频繁 compact</span></td></tr>
+      <tr><td><strong>96K</strong></td><td><strong>14 GB</strong></td><td><strong>32 GB</strong></td><td><strong>35 GB</strong></td><td><strong>56K</strong></td><td><span class="tag tag-ok">流畅</span></td></tr>
+      <tr><td>131K</td><td>19 GB</td><td>37 GB</td><td>41 GB</td><td>91K</td><td><span class="tag tag-err">崩溃</span></td></tr>
+    </table>
+    <div class="warning-box">
+      <strong>131K 崩溃日志:</strong> <code>HARD pressure: 36.3GB > 35.6GB → "Prefill above max_bytes at 269 tokens"</code> → Metal cap 37.4 GB 被突破 → 请求中止。
+    </div>
+  </div>
+</div>
+
+<!-- PERFORMANCE COMPARISON -->
+<h2>各阶段性能对比</h2>
+<div class="card">
+  <table>
+    <tr><th>阶段</th><th>配置</th><th>Token 速度</th><th>首响应</th><th>Cache</th><th>内存压力</th><th>体验</th></tr>
+    <tr>
+      <td>初始</td>
+      <td>双+MTPLX</td>
+      <td><span class="bad">14.6</span></td>
+      <td>3-5min</td>
+      <td>42%</td>
+      <td><span class="bad">持续震荡</span></td>
+      <td><span class="bad">❌</span></td>
+    </tr>
+    <tr>
+      <td>Step 1</td>
+      <td>单27B</td>
+      <td><span class="warn">14.9</span></td>
+      <td>2-3min</td>
+      <td>57%</td>
+      <td><span class="warn">偶尔soft</span></td>
+      <td><span class="warn">⚠️</span></td>
+    </tr>
+    <tr>
+      <td>Step 2</td>
+      <td>+关Thinking</td>
+      <td><span class="warn">17</span></td>
+      <td>2-3min</td>
+      <td>57%</td>
+      <td><span class="warn">偶尔soft</span></td>
+      <td><span class="warn">⚠️</span></td>
+    </tr>
+    <tr>
+      <td>Step 3</td>
+      <td>14B+64K</td>
+      <td><span class="good">50-70</span></td>
+      <td>~60s</td>
+      <td><span class="good">稳定</span></td>
+      <td><span class="good">无压力</span></td>
+      <td><span class="warn">compact频繁</span></td>
+    </tr>
+    <tr style="background:#1b3a1b20;">
+      <td><strong>Step 4</strong></td>
+      <td><strong>14B+96K</strong></td>
+      <td><strong class="good">50-70</strong></td>
+      <td><strong>~90s</strong></td>
+      <td><strong class="good">稳定</strong></td>
+      <td><strong class="good">无压力</strong></td>
+      <td><strong class="good">✅ 流畅</strong></td>
+    </tr>
+  </table>
+</div>
+
+<!-- MODEL COMPARISON -->
+<h2>模型横向对比 (M5 Pro 48GB)</h2>
+<div class="card">
+  <table>
+    <tr><th>模型</th><th>大小</th><th>96K 内存</th><th>Prefill 50K</th><th>生成速度</th><th>Cache</th><th>GDN</th><th>评级</th></tr>
+    <tr style="background:#1b3a1b20;">
+      <td><strong>Qwen2.5-Coder-14B</strong></td>
+      <td>8 GB</td>
+      <td><span class="good">22 GB</span></td>
+      <td><span class="good">~60s</span></td>
+      <td><span class="good">50-70 t/s</span></td>
+      <td><span class="good">✅</span></td>
+      <td>无</td>
+      <td><span class="good">🥇 9/10</span></td>
+    </tr>
+    <tr>
+      <td>Qwen2.5-Coder-32B</td>
+      <td>18 GB</td>
+      <td><span class="warn">32 GB</span></td>
+      <td>~120s</td>
+      <td>20-30 t/s</td>
+      <td><span class="good">✅</span></td>
+      <td>无</td>
+      <td><span class="warn">🥈 7/10</span></td>
+    </tr>
+    <tr>
+      <td>Qwen3.6-27B-4bit</td>
+      <td>14 GB</td>
+      <td>28 GB</td>
+      <td>~160s</td>
+      <td>25-35 t/s</td>
+      <td><span class="bad">⚠️</span></td>
+      <td><span class="bad">GDN</span></td>
+      <td><span class="warn">5/10</span></td>
+    </tr>
+    <tr>
+      <td>Qwen3.6-27B-MTPLX</td>
+      <td>15 GB</td>
+      <td>29 GB</td>
+      <td>~160s</td>
+      <td>25-35 t/s</td>
+      <td><span class="bad">⚠️</span></td>
+      <td><span class="bad">GDN</span></td>
+      <td><span class="bad">2/10</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- FINAL CONFIG -->
+<h2>最终推荐配置</h2>
+<div class="card">
+  <h3 style="margin-top:0;">settings.json</h3>
+<pre>{
+  "sampling": {
+    "max_context_window": <strong>98304</strong>,    // 96K 甜蜜点
+    "max_tokens": 32768
+  },
+  "scheduler": {
+    "chunked_prefill": <strong>true</strong>         // 防止 prefill 峰值
+  },
+  "claude_code": {
+    "context_scaling_enabled": <strong>false</strong>,  // 用 Claude Code 原生 compact
+    "opus_model": "<strong>Qwen2.5-Coder-14B-Instruct-MLX-4bit</strong>",
+    "sonnet_model": "<strong>Qwen2.5-Coder-14B-Instruct-MLX-4bit</strong>",
+    "haiku_model": "<strong>Qwen2.5-Coder-14B-Instruct-MLX-4bit</strong>"
+  }
+}</pre>
+</div>
+
+<!-- KEY INSIGHTS -->
+<h2>关键技术洞察</h2>
+
+<div class="stat-grid" style="grid-template-columns: 1fr;">
+  <div class="card">
+    <h3 style="margin-top:0;">1. Token 速度 ≠ 体感速度</h3>
+    <p>14.9 tok/s 指标不差，但思维链吃 50% 预算后 <strong>有效吞吐仅 7-8 tok/s</strong>。Dashboard 数字不能直接信。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">2. GDN 是 Agent 场景的致命弱点</h3>
+    <p>GDN 在单轮推理更高效，但在多轮 Claude Code 中 SSD prefix cache 被频繁拒绝 → 每次对话重新 prefill。标准注意力的 14B 虽然参数少，cache 稳定 → 总体更快。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">3. 小模型 + 大 Context > 大模型 + 小 Context</h3>
+    <p>14B+96K (56K 工作空间) 体验远超 27B+64K (24K 空间)。生成质量够用 + 不打断工作流 > 高质量但频繁 compact。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">4. Metal Cap = 37.4 GB 不可逾越</h3>
+    <p>48GB Mac 可用预算仅 ~20-25 GB (模型 + KV cache)。任何组合超过 37.4 GB 必崩。14B+96K=22GB 安全，14B+131K=37GB 撞墙。</p>
+  </div>
+</div>
+
+<div class="info-box" style="margin-top:2rem;">
+  <strong>后续计划:</strong> 将对 Ollama 和 LM Studio 进行相同的系统性分析，对比三种本地推理方案在 Claude Code 场景下的优劣。详见 <a href="concepts/omlx-local-model-optimization.md">完整 Markdown 文档</a>。
+</div>
+
+<p class="muted" style="text-align:center; margin-top:3rem; font-size:0.82rem;">
+  llm_wiki · concepts/omlx-local-model-optimization · 2026-05-27
+</p>
+
+</body>
+</html>

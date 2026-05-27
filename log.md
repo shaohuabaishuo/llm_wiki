@@ -75,3 +75,12 @@
 - Cross-references: [[hermes-agent-installation]], [[hermes-programming-best-practices]], [[hermes-tool-ecosystem]], [[inkos-ollama-local-setup]], [[llm-wiki]]
 - 配置产物：~/.hermes/config.yaml 添加了 custom_providers.local-deepseek + .wslconfig 配置 mirrored 网络
 - Updated index.md (total pages: 14 → 15)
+
+## [2026-05-27] create | oMLX 本地模型部署与性能优化实战
+- Created concept page: concepts/omlx-local-model-optimization.md — MacBook Pro M5 Pro 48GB + oMLX v0.3.11 系统性性能调优全记录
+- Covers 4 optimization stages: (1) dual→single model + MTPLX→vanilla, (2) disabling thinking tokens (8.6x speedup), (3) switching to Qwen2.5-Coder-14B to avoid GDN cache rejection, (4) context window calibration to 96K sweet spot
+- Key findings: GatedDeltaNet incompatible with oMLX SSD prefix cache, thinking tokens consumed 50% of throughput, Metal cap at 37.4GB is hardware ceiling
+- Final config: Qwen2.5-Coder-14B-Instruct-MLX-4bit + 96K context + chunked_prefill=true → 50-70 tok/s stable
+- Cross-references: [[hermes-local-deepseek-setup]], [[inkos-ollama-local-setup]]
+- Source: 实地诊断会话 — Dashboard 实时监控 + API 探针 + 日志分析 + 8 小时迭代优化
+- Updated index.md (total pages: 15 → 16)

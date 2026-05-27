@@ -2,7 +2,7 @@
 
 > Content catalog. Every wiki page listed under its type with a one-line summary.
 > Read this first to find relevant pages for any query.
-| Last updated: 2026-04-24 | Total pages: 15
+| Last updated: 2026-05-27 | Total pages: 16
 
 ## Entities
 <!-- Alphabetical within section -->
@@ -22,6 +22,7 @@
 - [Inkos 连接本地 Ollama 模型配置指南](concepts/inkos-ollama-local-setup.md) – 从零开始将 Inkos 接入本地 Ollama 模型的完整操作流程，含 WSL2 网络穿透。
 - [Obsidian 入门使用说明书](concepts/obsidian-guide.md) – 完整的中文 Obsidian 入门指南，从安装到高级功能，含 LLM Wiki 集成最佳实践。
 - [Hermes 接入本地 DeepSeek 模型配置指南](concepts/hermes-local-deepseek-setup.md) – Hermes Agent 对接本地 Ollama DeepSeek 模型的完整配置，含 WSL2 网络、上下文优化、模型切换。
+- [oMLX 本地模型部署与性能优化实战](concepts/omlx-local-model-optimization.md) – MacBook Pro M5 Pro 48GB + oMLX 系统性性能调优：从 14.6 tok/s 到 70 tok/s 的完整优化流程，含 GDN 架构分析、Context 校准、Thinking Token 消除、内存压力诊断。
 
 ## Comparisons
 <!-- Alphabetical within section -->
