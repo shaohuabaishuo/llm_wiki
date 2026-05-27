@@ -2,7 +2,7 @@
 
 > Content catalog. Every wiki page listed under its type with a one-line summary.
 > Read this first to find relevant pages for any query.
-| Last updated: 2026-05-27 | Total pages: 16
+| Last updated: 2026-05-27 | Total pages: 17
 
 ## Entities
 <!-- Alphabetical within section -->
@@ -27,6 +27,7 @@
 ## Comparisons
 <!-- Alphabetical within section -->
 - [Novel Writing Agent Comparison](comparisons/novel-writing-agents-2026.md) – Side-by-side comparison of 5 open-source novel writing agents.
+- [Apple Silicon 本地 LLM 推理 — M5 Pro/Max 多配置横向对比](comparisons/apple-silicon-llm-benchmark.md) – M5 Pro 48GB vs M5 Max 64GB vs 128GB：Metal Cap 精算、带宽分析、模型推荐、价格/API性价比。
 
 ## Queries
 <!-- Alphabetical within section -->

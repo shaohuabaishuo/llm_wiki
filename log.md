@@ -84,3 +84,14 @@
 - Cross-references: [[hermes-local-deepseek-setup]], [[inkos-ollama-local-setup]]
 - Source: 实地诊断会话 — Dashboard 实时监控 + API 探针 + 日志分析 + 8 小时迭代优化
 - Updated index.md (total pages: 15 → 16)
+
+## [2026-05-27] create | Apple Silicon M5 Pro/Max 多配置横向对比
+- Created comparison page: comparisons/apple-silicon-llm-benchmark.md — M5 Pro 48GB vs M5 Max 40c 64GB vs 128GB 全面对比
+- Metal Cap 精算 (48→37.4, 64→50, 128→100 GB)、内存带宽分析 (307 vs 614 GB/s)
+- 各配置最优模型推荐：A=14B+96K, B=32B+131K, C=32B+200K/70B+131K
+- 关键发现: 带宽翻倍对 14B 收益仅 10-27%，对 32B 收益 75% — 32B 才是真正需要 614 GB/s 的模型
+- API 替代成本分析：$900 差价 = DeepSeek v3 3.5 年用量 (日均100K)
+- 性价比结论：B (64GB Max) 是甜点位，C (128GB) 边际递减
+- Also updated oMLX optimization HTML with multi-config comparison section
+- Cross-references: [[omlx-local-model-optimization]]
+- Updated index.md (total pages: 16 → 17)

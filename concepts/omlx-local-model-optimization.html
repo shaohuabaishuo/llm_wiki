@@ -400,6 +400,127 @@
 }</pre>
 </div>
 
+<!-- MULTI-CONFIG COMPARISON -->
+<h2>M5 Pro vs M5 Max 多配置对比 (48GB / 64GB / 128GB)</h2>
+<div class="card">
+  <h3 style="margin-top:0;">三个配置概览</h3>
+  <table>
+    <tr><th>配置</th><th>芯片</th><th>带宽</th><th>Metal Cap</th><th>价格(14寸)</th></tr>
+    <tr style="background:#1b3a1b20;">
+      <td><strong>A — 当前</strong></td>
+      <td>M5 Pro</td><td>307 GB/s</td><td>37.4 GB</td><td>~$2,899</td>
+    </tr>
+    <tr>
+      <td><strong>B — 甜点</strong></td>
+      <td>M5 Max 40c</td>
+      <td><strong>614 GB/s</strong></td>
+      <td><strong>~50 GB</strong></td>
+      <td><strong>~$3,799</strong></td>
+    </tr>
+    <tr>
+      <td><strong>C — 奢侈</strong></td>
+      <td>M5 Max 40c</td>
+      <td><strong>614 GB/s</strong></td>
+      <td><strong>~100 GB</strong></td>
+      <td>~$4,599</td>
+    </tr>
+  </table>
+  <p class="muted" style="font-size:0.82rem;">A→B: +$900 (31%) | B→C: +$800 (21%)</p>
+</div>
+
+<div class="card">
+  <h3>Metal Cap 精算 — 为什么标称内存不可全用</h3>
+  <pre style="font-size:0.82rem;">
+标称内存:    48 GB            64 GB           128 GB
+Metal Cap:   37.4 GB (78%)    ~50 GB (78%)    ~100 GB (78%)
+系统占用:    ~10 GB           ~12 GB          ~15 GB
+─────────────────────────────────────────────────────
+oMLX 可用:   ~27 GB           ~38 GB          ~85 GB
+Soft (85%):  31.8 GB          42.5 GB         85.0 GB
+Hard (95%):  35.6 GB          47.5 GB         95.0 GB</pre>
+  <p><strong>实际可用仅标称值的 ~56%。</strong></p>
+</div>
+
+<div class="card">
+  <h3>各配置最优模型 + 性能预估</h3>
+  <table>
+    <tr><th>配置</th><th>推荐模型</th><th>权重</th><th>Context</th><th>KV Cache</th><th>进程基线</th><th>Prefill 50K</th><th>生成速度</th><th>Claude Code 评分</th></tr>
+    <tr style="background:#1b3a1b20;">
+      <td><strong>A</strong></td>
+      <td>14B Coder</td><td>8 GB</td><td>96K</td><td>14 GB</td><td><span class="good">~25 GB</span></td><td><span class="good">~90s</span></td><td><span class="good">50-70 t/s</span></td><td><span class="good">7.5/10</span></td>
+    </tr>
+    <tr>
+      <td><strong>B</strong></td>
+      <td>32B Coder</td><td>18 GB</td><td>131K</td><td>19 GB</td><td><span class="warn">~40 GB</span></td><td><span class="good">~60s</span></td><td>30-45 t/s</td><td><strong>8.5/10</strong></td>
+    </tr>
+    <tr>
+      <td><strong>C</strong></td>
+      <td>32B/70B Coder</td><td>18/38 GB</td><td>200K/131K</td><td>29/19 GB</td><td><span class="good">~50/61 GB</span></td><td>~75s/~180s</td><td>30-45 / 15-20 t/s</td><td>8.0/10</td>
+    </tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>带宽翻倍对 14B vs 32B 的不同影响</h3>
+  <div class="bench-compare">
+    <div class="card bench-before">
+      <div class="muted" style="font-size:0.78rem;">307 GB/s (M5 Pro)</div>
+      <div>14B prefill: ~300 tok/s</div>
+      <div>32B prefill: ~200 tok/s</div>
+      <div>14B 生成: 50-70 tok/s</div>
+      <div>32B 生成: <span class="bad">15-22 tok/s — 带宽瓶颈!</span></div>
+    </div>
+    <div class="card bench-after">
+      <div class="muted" style="font-size:0.78rem;">614 GB/s (M5 Max)</div>
+      <div>14B prefill: ~380 tok/s <span class="muted">(+27%)</span></div>
+      <div>32B prefill: <strong class="good">~350 tok/s (+75%)</strong></div>
+      <div>14B 生成: 55-75 tok/s <span class="muted">(+10%)</span></div>
+      <div>32B 生成: <strong>30-45 tok/s — 瓶颈解除</strong></div>
+    </div>
+  </div>
+  <p class="muted" style="font-size:0.85rem;"><strong>14B 在 307 GB/s 下已经跑在计算天花板，翻倍带宽收益仅 10-27%。32B 才是真正需要 614 GB/s 的模型。</strong></p>
+</div>
+
+<div class="card">
+  <h3>性价比分析</h3>
+  <table>
+    <tr><th>对比</th><th>差价</th><th>核心收益</th><th>分析</th></tr>
+    <tr>
+      <td>A → B</td>
+      <td>+$900</td>
+      <td>14B→32B + 带宽2x + 零compact</td>
+      <td><span class="good">高密度收益 — 三个维度同时提升</span></td>
+    </tr>
+    <tr>
+      <td>B → C</td>
+      <td>+$800</td>
+      <td>能跑70B(但更慢) + 200K context</td>
+      <td><span class="warn">边际递减 — 70B价值待验证</span></td>
+    </tr>
+  </table>
+</div>
+
+<div class="warning-box">
+  <strong>API 替代成本:</strong> $900 差价够买 DeepSeek v3 API <strong>128M token</strong> (日均 100K → 够用 3.5 年)，或 Claude Sonnet 4 <strong>9M token</strong> (日均 100K → 够用 3 个月)。<br>
+  <strong>结论:</strong> 轻度用户 ($900=3年API) 不需要升级。重度用户 ($900&thinsp;<&thinsp;1年API) 硬件升级更划算。
+</div>
+
+<div class="card">
+  <h3>最终推荐矩阵</h3>
+  <table>
+    <tr><th>预算</th><th>芯片</th><th>内存</th><th>模型</th><th>Context</th><th>体验</th><th>性价比</th></tr>
+    <tr style="background:#1b3a1b20;">
+      <td>省</td><td>M5 Pro</td><td>48GB</td><td>14B Coder</td><td>96K</td><td>流畅</td><td><span class="good">🥇</span></td>
+    </tr>
+    <tr>
+      <td><strong>中</strong></td><td><strong>M5 Max 40c</strong></td><td><strong>64GB</strong></td><td><strong>32B Coder</strong></td><td><strong>131K</strong></td><td><strong>更强</strong></td><td><span class="warn">🥈</span></td>
+    </tr>
+    <tr>
+      <td>豪</td><td>M5 Max 40c</td><td>128GB</td><td>32B(快)/70B(深)</td><td>200K</td><td>全能</td><td><span class="muted">🥉</span></td>
+    </tr>
+  </table>
+</div>
+
 <!-- KEY INSIGHTS -->
 <h2>关键技术洞察</h2>
 
